@@ -2,37 +2,43 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PlayerController : MonoBehaviour
+public class PlayerController : MonoBehaviour 
 {
     public float speed;
-    private Rigidbody rb;
     public float jump;
-    private bool jumping;
+    private bool isjumping;
+    Rigidbody rb;
+    private bool isgrounded;
 
-	void Start () {
+
+    private void Start()
+    {
         rb = GetComponent<Rigidbody>();
-	}
-
-    void FixedUpdate () {
-        // moving left and right
-        float h = Input.GetAxis("Horizontal");
-        Vector3 moveBy = new Vector3(h * speed, 0.0f, 0.0f);
-        rb.MovePosition(transform.position + moveBy * Time.deltaTime);
-
-        // jumping
-        if (Input.GetButton("Jump") && jumping == false)
-        {
-            jumping = true;
-            rb.AddForce(0.0f, jump, 0.0f, ForceMode.Impulse);
-        }
     }
+
+
+    private void Update()
+    {
+        if (Input.GetButtonDown("Jump"))
+            isjumping = true;
+    }
+
+
+    private void FixedUpdate()
+    {
+        // move horizontal
+        float h = Input.GetAxis("Horizontal");
+        rb.MovePosition(transform.position + new Vector3(h * speed * Time.deltaTime, 0.0f, 0.0f));
+
+        if (isjumping && isgrounded)
+            rb.AddForce(0.0f, jump, 0.0f, ForceMode.Impulse);
+    }
+
 
     private void OnTriggerStay(Collider other)
     {
-        if(other.tag == "Floor")
-        {
-            jumping = false;
-        }
+        if (other.tag == "Platform")
+            isgrounded = true;
     }
 
 }
