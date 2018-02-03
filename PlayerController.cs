@@ -1,44 +1,59 @@
+// attatch this script to a player game object that has a rigidbody component
+// the boolean isgrounded depends on game objects with "Platform" as tag
+
+
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+
 public class PlayerController : MonoBehaviour 
 {
+
     public float speed;
-    public float jump;
-    private bool isjumping;
-    Rigidbody rb;
+    public float jumpforce;
+    private Rigidbody rbody;
+    private bool jumping;
     private bool isgrounded;
 
 
     private void Start()
     {
-        rb = GetComponent<Rigidbody>();
+        rbody = GetComponent<Rigidbody>();
     }
 
 
     private void Update()
     {
-        if (Input.GetButtonDown("Jump"))
-            isjumping = true;
+        if (Input.GetButtonDown("Jump") && isgrounded)
+        {
+            jumping = true;
+        }
     }
 
 
     private void FixedUpdate()
     {
-        // move horizontal
+        // move
         float h = Input.GetAxis("Horizontal");
-        rb.MovePosition(transform.position + new Vector3(h * speed * Time.deltaTime, 0.0f, 0.0f));
+        rbody.velocity = new Vector3(h * speed, rbody.velocity.y, 0.0f);
 
-        if (isjumping && isgrounded)
-            rb.AddForce(0.0f, jump, 0.0f, ForceMode.Impulse);
+        // jump
+        if (jumping)
+        {
+            rbody.AddForce(0.0f, jumpforce, 0.0f, ForceMode.Impulse);
+            jumping = false;
+            isgrounded = false;
+
+        }
     }
 
 
-    private void OnTriggerStay(Collider other)
+    private void OnCollisionEnter(Collision collision)
     {
-        if (other.tag == "Platform")
+        if (collision.gameObject.tag == "Platform")
             isgrounded = true;
     }
 
 }
+ 
